@@ -220,7 +220,7 @@ describe('Client', function () {
         queryOptions: { consistency: types.consistencies.quorum }
       });
       let pageState;
-      let metaPageState;
+      let rawPageState;
       const table = helper.getRandomName('table');
       utils.series([
         helper.toTask(client.execute, client, helper.createTableCql(table)),
@@ -236,7 +236,7 @@ describe('Client', function () {
             assert.ifError(err);
             assert.strictEqual(result.rows.length, 70);
             pageState = result.pageState;
-            metaPageState = result.meta.pageState;
+            rawPageState = result.rawPageState;
             seriesNext();
           });
         },
@@ -250,7 +250,7 @@ describe('Client', function () {
         },
         function selectDataRemainingWithMetaPageState(seriesNext) {
           //The remaining
-          client.execute(util.format('SELECT * FROM %s', table), [], {prepare: 1, pageState: metaPageState}, function (err, result) {
+          client.execute(util.format('SELECT * FROM %s', table), [], {prepare: 1, pageState: rawPageState}, function (err, result) {
             assert.ifError(err);
             assert.strictEqual(result.rows.length, 30);
             seriesNext();
